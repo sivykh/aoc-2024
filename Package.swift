@@ -9,20 +9,20 @@ let dependencies: [Target.Dependency] = [
 
 let package = Package(
     name: "AdventOfCode",
-    platforms: [.macOS(.v13)],
+    platforms: [.macOS(.v14)],
     dependencies: [
         .package(
             url: "https://github.com/apple/swift-algorithms.git",
             .upToNextMajor(from: "1.2.0")),
         .package(
             url: "https://github.com/apple/swift-collections.git",
-            .upToNextMajor(from: "1.0.0")),
+            .upToNextMajor(from: "1.1.4")),
         .package(
             url: "https://github.com/apple/swift-argument-parser.git",
-            .upToNextMajor(from: "1.2.0")),
+            .upToNextMajor(from: "1.5.0")),
         .package(
             url: "https://github.com/apple/swift-format.git",
-            .upToNextMajor(from: "509.0.0"))
+            .upToNextMajor(from: "600.0.0"))
     ],
     targets: [
         .executableTarget(
