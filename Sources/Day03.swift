@@ -33,10 +33,8 @@ struct Day03: AdventDay {
             var i = 0, j = 0
             while j < dontRanges.count {
                 let up = dontRanges[j].upperBound
-                defer {
-                    j += 1
-                }
                 guard up > start else {
+                    j += 1
                     continue
                 }
                 validRanges.append(Range(uncheckedBounds: (start, up)))
@@ -44,10 +42,10 @@ struct Day03: AdventDay {
                     i += 1
                 }
                 if i == doRanges.count {
-                    j -= 1
                     break
                 }
                 start = doRanges[i].lowerBound
+                j += 1
             }
             if j == dontRanges.count {
                 validRanges.append(Range(uncheckedBounds: (start, string.endIndex)))
