@@ -10,75 +10,39 @@ struct Day03: AdventDay {
     }
     
     func part1() -> Any {
-        calc(string: entities)
+        var string = entities
+
+        var res = 0
+        let regex = /mul\((?<a>\d{1,3}),(?<b>\d{1,3})\)/
+        
+        while let match = try! regex.firstMatch(in: string) {
+            if let a = Int(match.output.a), let b = Int(match.output.b) {
+                res += a * b
+            }
+            string = String(string[match.range.upperBound...])
+        }
+        return res
     }
     
     func part2() -> Any {
-        let string = entities
-        var validRanges = [Range<String.Index>]()
-        
-        let regexDo = try! NSRegularExpression(pattern: "do\\(\\)")
-        let regexDont = try! NSRegularExpression(pattern: "don\\'t\\(\\)")
-        
-        let resultsDo = regexDo.matches(in: string, range: NSRange(string.startIndex..., in: string))
-        let resultsDont = regexDont.matches(in: string, range: NSRange(string.startIndex..., in: string))
-        
-        let doRanges = resultsDo.compactMap({ Range($0.range, in: string) })
-        let dontRanges = resultsDont.compactMap({ Range($0.range, in: string) })
-        
-        if dontRanges.isEmpty {
-            validRanges = [Range(uncheckedBounds: (string.startIndex, string.endIndex))]
-        } else {
-            var start = string.startIndex
-            var i = 0, j = 0
-            while j < dontRanges.count {
-                let up = dontRanges[j].upperBound
-                guard up > start else {
-                    j += 1
-                    continue
-                }
-                validRanges.append(Range(uncheckedBounds: (start, up)))
-                while i < doRanges.count, doRanges[i].lowerBound < up {
-                    i += 1
-                }
-                if i == doRanges.count {
-                    break
-                }
-                start = doRanges[i].lowerBound
-                j += 1
-            }
-            if j == dontRanges.count {
-                validRanges.append(Range(uncheckedBounds: (start, string.endIndex)))
-            }
-        }
-        return calc(string: string, validRanges: validRanges)
-    }
-
-    func calc(string: String, validRanges: [Range<String.Index>]? = nil) -> Int {
-        let validRanges = validRanges ?? [Range(uncheckedBounds: (string.startIndex, string.endIndex))]
+        var string = entities
         
         var res = 0
-        let regex = try! NSRegularExpression(pattern: "mul\\(\\d{1,3},\\d{1,3}\\)")
-        let results = regex.matches(in: string, range: NSRange(string.startIndex..., in: string))
+        var enabled = true
+        let regex = /mul\((?<a>\d{1,3}),(?<b>\d{1,3})\)|(?<c>do)\(\)|(?<d>don't)\(\)/
         
-        for r in results {
-            guard let subRange = Range(r.range, in: string) else {
+        while let match = try! regex.firstMatch(in: string) {
+            defer {
+                string = String(string[match.range.upperBound...])
+            }
+            guard match.output.c == nil && match.output.d == nil else {
+                enabled = match.output.d == nil
                 continue
             }
-            guard validRanges
-                .contains(where: { $0.lowerBound <= subRange.lowerBound && $0.upperBound >= subRange.upperBound })
-            else {
-                continue
-            }
-            let sub = String(string[Range(r.range, in: string)!])
-                .replacingOccurrences(of: "mul(", with: "")
-                .dropLast()
-                .components(separatedBy: ",")
-            if sub.count > 1, let a = Int(sub[0]), let b = Int(sub[1]) {
+            if enabled, let a = Int(match.output.a!), let b = Int(match.output.b!) {
                 res += a * b
             }
         }
-        
         return res
     }
 }
