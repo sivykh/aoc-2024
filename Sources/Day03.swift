@@ -37,11 +37,12 @@ struct Day03: AdventDay {
         let input = entities
 
         var res = 0
+        var enable = true
         for string in input {
             do {
                 let regex = try NSRegularExpression(pattern: "mul\\(\\d{1,3},\\d{1,3}\\)")
                 let regexDo = try NSRegularExpression(pattern: "do\\(\\)")
-                let regexDont = try NSRegularExpression(pattern: "don't\\(\\)")
+                let regexDont = try NSRegularExpression(pattern: "don\\'t\\(\\)")
 
                 let results = regex.matches(in: string, range: NSRange(string.startIndex..., in: string))
                 let resultsDo = regexDo.matches(in: string, range: NSRange(string.startIndex..., in: string))
@@ -54,11 +55,13 @@ struct Day03: AdventDay {
                 if dontRanges.isEmpty {
                     validRanges = [Range(uncheckedBounds: (string.startIndex, string.endIndex))]
                 } else {
-
-                    var start = string.startIndex
-                    var i = 0
-                    for j in 0..<dontRanges.count {
+                    var start = enable ? string.startIndex : (doRanges.isEmpty ? string.endIndex : doRanges[0].lowerBound)
+                    var i = enable ? 0 : 1, j = 0
+                    while j < dontRanges.count {
                         let up = dontRanges[j].upperBound
+                        defer {
+                            j += 1
+                        }
                         guard up > start else {
                             continue
                         }
@@ -67,27 +70,25 @@ struct Day03: AdventDay {
                             i += 1
                         }
                         if i == doRanges.count {
+                            j -= 1
                             break
                         }
                         start = doRanges[i].lowerBound
                     }
+                    enable = j == dontRanges.count
+                    if enable {
+                        validRanges.append(Range(uncheckedBounds: (start, string.endIndex)))
+                    }
                 }
 
-                var validIndex = 0
                 for r in results {
                     guard let subRange = Range(r.range, in: string) else {
                         continue
                     }
-                    while validIndex < validRanges.count {
-                        if validRanges[validIndex].lowerBound <= subRange.lowerBound
-                            && validRanges[validIndex].upperBound >= subRange.upperBound {
-                            break
-                        } else {
-                            validIndex += 1
-                        }
-                    }
-                    if validIndex == validRanges.count {
-                        break
+                    guard validRanges
+                        .contains(where: { $0.lowerBound <= subRange.lowerBound && $0.upperBound >= subRange.upperBound })
+                    else {
+                        continue
                     }
                     let sub = String(string[subRange])
                         .replacingOccurrences(of: "mul(", with: "")
