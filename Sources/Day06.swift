@@ -32,9 +32,6 @@ struct Day06: AdventDay {
         var (m, n, start, obstructions) = entities
         var res = 0
         for ij in calc(m: m, n: n, start: start, obstructions: obstructions).distinct {
-            guard !obstructions[ij.0 * n + ij.1] else {
-                continue
-            }
             obstructions[ij.0 * n + ij.1] = true
             res += calc(m: m, n: n, start: start, obstructions: obstructions).cycle ? 1 : 0
             obstructions[ij.0 * n + ij.1] = false
