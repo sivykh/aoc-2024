@@ -34,8 +34,6 @@ struct Day06: AdventDay {
     func part2() -> Any {
         var (m, n, start, obstructions) = entities
         var res = 0
-        let moves = [[-1, 0], [0, 1], [1, 0], [0, -1]]
-
         for i in 0..<m {
             for j in 0..<n {
                 guard !obstructions[i][j] else {
