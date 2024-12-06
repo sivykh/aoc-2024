@@ -1,5 +1,4 @@
 import Algorithms
-import Collections
 
 struct Day06: AdventDay {
     var data: String
