@@ -25,13 +25,13 @@ struct Day06: AdventDay {
     
     func part1() -> Any {
         let (m, n, start, obstructions) = entities
-        return calc(m: m, n: n, start: start, obstructions: obstructions).distinct
+        return calc(m: m, n: n, start: start, obstructions: obstructions).distinct.count
     }
     
     func part2() -> Any {
         var (m, n, start, obstructions) = entities
         var res = 0
-        for ij in product(0..<m, 0..<n) {
+        for ij in calc(m: m, n: n, start: start, obstructions: obstructions).distinct {
             guard !obstructions[ij.0 * n + ij.1] else {
                 continue
             }
@@ -42,20 +42,22 @@ struct Day06: AdventDay {
         return res
     }
     
-    private func calc(m: Int, n: Int, start: (row: Int, col: Int), obstructions: [Bool]) -> (distinct: Int, cycle: Bool) {
+    private func calc(m: Int, n: Int, start: (row: Int, col: Int),
+                      obstructions: [Bool]) -> (distinct: [(row: Int, col: Int)], cycle: Bool) {
         let moves = [[-1, 0], [0, 1], [1, 0], [0, -1]]
         var current = start
-        var distinct = 0
-        var visited = [Bool](repeating: false, count: m * n * moves.count)
+        var distinct = [(row: Int, col: Int)]()
+        var visited = [Int](repeating: 0, count: m * n)
         var moveIndex = 0
         while 0..<m ~= current.row, 0..<n ~= current.col {
-            let visitedIndex0 = current.row * n * moves.count + current.col * moves.count
-            let visitedIndex = visitedIndex0 + moveIndex
-            if visited[visitedIndex] {
+            let visitedIndex = current.row * n + current.col
+            if visited[visitedIndex] & (1 << moveIndex) > 0 {
                 return (distinct, true)
             }
-            distinct += visited[visitedIndex0..<(visitedIndex0 + moves.count)].contains(true) ? 0 : 1
-            visited[visitedIndex] = true
+            if visited[visitedIndex] == 0 {
+                distinct.append(current)
+            }
+            visited[visitedIndex] |= (1 << moveIndex)
             var next = (row: current.row + moves[moveIndex][0], col: current.col + moves[moveIndex][1])
             while 0..<m ~= next.row && 0..<n ~= next.col && obstructions[next.row * n + next.col] {
                 moveIndex = (moveIndex + 1) % moves.count
