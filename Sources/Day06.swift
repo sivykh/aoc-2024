@@ -50,17 +50,19 @@ struct Day06: AdventDay {
     }
     
     private func calc(m: Int, n: Int, start: (row: Int, col: Int), obstructions: [[Bool]]) -> (distinct: Int, cycle: Bool) {
+        let moves = [[-1, 0], [0, 1], [1, 0], [0, -1]]
         var current = start
         var distinct = 0
-        var visited = [[[Bool]]](repeating: [[Bool]](repeating: [false, false, false, false], count: n), count: m)
-        let moves = [[-1, 0], [0, 1], [1, 0], [0, -1]]
+        var visited = [Bool](repeating: false, count: m * n * moves.count)
         var moveIndex = 0
         while 0..<m ~= current.row, 0..<n ~= current.col {
-            if visited[current.row][current.col][moveIndex] {
+            let visitedIndex0 = current.row * n * moves.count + current.col * moves.count
+            let visitedIndex = visitedIndex0 + moveIndex
+            if visited[visitedIndex] {
                 return (distinct, true)
             }
-            distinct += visited[current.row][current.col].contains(true) ? 0 : 1
-            visited[current.row][current.col][moveIndex] = true
+            distinct += visited[visitedIndex0..<(visitedIndex0 + moves.count)].contains(true) ? 0 : 1
+            visited[visitedIndex] = true
             var next = (row: current.row + moves[moveIndex][0], col: current.col + moves[moveIndex][1])
             while 0..<m ~= next.row && 0..<n ~= next.col && obstructions[next.row][next.col] {
                 moveIndex = (moveIndex + 1) % moves.count
