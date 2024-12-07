@@ -27,18 +27,22 @@ struct Day06: AdventDay {
         let (m, n, start, obstructions) = entities
         return calc(m: m, n: n, start: start, obstructions: obstructions).distinct.count
     }
-    
-    func part2() -> Any {
+
+    func part2() async -> Any {
         var (m, n, start, obstructions) = entities
-        var res = 0
-        for ij in calc(m: m, n: n, start: start, obstructions: obstructions).distinct {
-            obstructions[ij.0 * n + ij.1] = true
-            res += calc(m: m, n: n, start: start, obstructions: obstructions).cycle ? 1 : 0
-            obstructions[ij.0 * n + ij.1] = false
+        let res = await withTaskGroup(of: Int.self, returning: Int.self) { group in
+            for ij in calc(m: m, n: n, start: start, obstructions: obstructions).distinct {
+                obstructions[ij.0 * n + ij.1] = true
+                group.addTask { [m, n, start, obstructions] in
+                    calc(m: m, n: n, start: start, obstructions: obstructions).cycle ? 1 : 0
+                }
+                obstructions[ij.0 * n + ij.1] = false
+            }
+            return await group.reduce(0, +)
         }
         return res
     }
-    
+
     private func calc(m: Int, n: Int, start: (row: Int, col: Int),
                       obstructions: [Bool]) -> (distinct: [(row: Int, col: Int)], cycle: Bool) {
         let moves = [[-1, 0], [0, 1], [1, 0], [0, -1]]
