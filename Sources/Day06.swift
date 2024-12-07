@@ -4,18 +4,18 @@ struct Day06: AdventDay {
     var data: String
     
     var entities: (m: Int, n: Int, (row: Int, col: Int), obstructions: [Bool]) {
-        let grid = data.split(separator: "\n").map {
+        let grid = data.utf8CString.dropLast().split(separator: 10).map {
             Array($0)
         }
-        
+
         let m = grid.count
         let n = grid[0].count
 
         var obstructions = [Bool](repeating: false, count: m * n)
         var start = (row: 0, col: 0)
         for ij in product(0..<m, 0..<n) {
-            obstructions[ij.0 * n + ij.1] = grid[ij.0][ij.1] == "#"
-            if grid[ij.0][ij.1] == "^" {
+            obstructions[ij.0 * n + ij.1] = grid[ij.0][ij.1] == 35
+            if grid[ij.0][ij.1] == 94 {
                 start = ij
             }
         }
