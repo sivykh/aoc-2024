@@ -1,5 +1,6 @@
 import Algorithms
 import Collections
+import Foundation
 
 struct Day07: AdventDay {
     var data: String
@@ -30,9 +31,9 @@ struct Day07: AdventDay {
             return false
         }
         guard numbers.count > 2 else {
-            return value == numbers[0] + numbers[1] 
+            return value == numbers[0] + numbers[1]
                 || value == numbers[0] * numbers[1]
-                || (concat && value == Int("\(numbers[0])\(numbers[1])"))
+                || (concat && value == Int(pow(10, floor(1 + log10(Double(numbers[1]))))) * numbers[0] + numbers[1])
         }
         let tail = Array(numbers[2...])
         if isGood(value: value, numbers: [numbers[0] * numbers[1]] + tail, concat: concat) {
@@ -42,7 +43,9 @@ struct Day07: AdventDay {
             return true
         }
         if concat {
-            return isGood(value: value, numbers: [Int("\(numbers[0])\(numbers[1])")!] + tail, concat: concat)
+            return isGood(value: value, 
+                          numbers: [Int(pow(10, floor(1 + log10(Double(numbers[1]))))) * numbers[0] + numbers[1]] + tail,
+                          concat: concat)
         }
         return false
     }
