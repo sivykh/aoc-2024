@@ -28,46 +28,49 @@ struct Day08: AdventDay {
         return (side, res)
     }
     
-    func part1() -> Any {
-        common(part2: false)
+    func part1() async -> Any {
+        await common(part2: false)
     }
     
-    func part2() -> Any {
-        common(part2: true)
+    func part2() async -> Any {
+        await common(part2: true)
     }
 
-    func common(part2: Bool) -> Any {
+    func common(part2: Bool) async -> Any {
         let input = entities
         let range = 0..<input.side
         let limit = part2 ? input.side : 2
-        var anti = Set<Cell>()
 
-        for char in input.data.keys {
-            let count = input.data[char]!.count
-            for i in 0..<count {
-                for j in (i + 1)..<count {
-                    let cell1 = input.data[char]![i]
-                    let cell2 = input.data[char]![j]
-                    let dr = (cell2.r - cell1.r)
-                    let dc = (cell2.c - cell1.c)
+        return await withTaskGroup(of: Set<Cell>.self, returning: Set<Cell>.self) { group in
+            for char in input.data.keys {
+                let count = input.data[char]!.count
+                group.addTask {
                     var positions: Set<Cell> = []
-                    for cell in [cell1, cell2] {
-                        for sign in [-1, 1] {
-                            for m in 1..<limit {
-                                guard range ~= cell.r + m * sign * dr, range ~= cell.c + m * sign * dc else {
-                                    break
+                    for i in 0..<count {
+                        for j in (i + 1)..<count {
+                            let cell1 = input.data[char]![i]
+                            let cell2 = input.data[char]![j]
+                            let dr = (cell2.r - cell1.r)
+                            let dc = (cell2.c - cell1.c)
+                            for cell in [cell1, cell2] {
+                                for sign in [-1, 1] {
+                                    for m in 1..<limit {
+                                        guard range ~= cell.r + m * sign * dr, range ~= cell.c + m * sign * dc else {
+                                            break
+                                        }
+                                        positions.insert(.init(cell.r + m * sign * dr, cell.c + m * sign * dc))
+                                    }
                                 }
-                                positions.insert(.init(cell.r + m * sign * dr, cell.c + m * sign * dc))
+                            }
+                            if !part2 {
+                                positions.subtract([cell1, cell2])
                             }
                         }
                     }
-                    if !part2 {
-                        positions.subtract([cell1, cell2])
-                    }
-                    anti.formUnion(positions)
+                    return positions
                 }
             }
-        }
-        return anti.count
+            return await group.reduce(into: Set<Cell>(), { $0.formUnion($1) })
+        }.count
     }
 }
