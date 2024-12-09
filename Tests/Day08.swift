@@ -17,13 +17,15 @@ final class Day08Tests: XCTestCase {
     ............
     """
 
-    func testPart1() throws {
+    func testPart1() async throws {
         let challenge = Day08(data: testData)
-        XCTAssertEqual(String(describing: challenge.part1()), "14")
+        let result = await challenge.part1()
+        XCTAssertEqual(String(describing: result), "14")
     }
 
-    func testPart2() throws {
+    func testPart2() async throws {
         let challenge = Day08(data: testData)
-        XCTAssertEqual(String(describing: challenge.part2()), "34")
+        let result = await challenge.part2()
+        XCTAssertEqual(String(describing: result), "34")
     }
 }
