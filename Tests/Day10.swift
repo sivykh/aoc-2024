@@ -13,13 +13,15 @@ final class Day10Tests: XCTestCase {
     10456732
     """
 
-    func testPart1() throws {
+    func testPart1() async throws {
         let challenge = Day10(data: testData)
-        XCTAssertEqual(String(describing: challenge.part1()), "36")
+        let result = await challenge.part1()
+        XCTAssertEqual(String(describing: result), "36")
     }
 
-    func testPart2() throws {
+    func testPart2() async throws {
         let challenge = Day10(data: testData)
-        XCTAssertEqual(String(describing: challenge.part2()), "81")
+        let result = await challenge.part2()
+        XCTAssertEqual(String(describing: result), "81")
     }
 }
