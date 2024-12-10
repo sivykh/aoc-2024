@@ -9,58 +9,40 @@ struct Day10: AdventDay {
     }
     
     func part2() -> Any {
-        let input = entities
-
-        func dfs(search: Int, row: Int, col: Int) -> Int {
-            guard 0..<input.count ~= row, 0..<input[row].count ~= col, search == input[row][col] else {
-                return 0
-            }
-            guard search < 9 else {
-                return 1
-            }
-            return dfs(search: search + 1, row: row + 1, col: col)
-                + dfs(search: search + 1, row: row - 1, col: col)
-                + dfs(search: search + 1, row: row, col: col + 1)
-                + dfs(search: search + 1, row: row, col: col - 1)
-        }
-
-        var res = 0
-        for row in 0..<input.count {
-            for col in 0..<input[row].count {
-                res += dfs(search: 0, row: row, col: col)
-            }
-        }
-
-        return res
+        common().part2
     }
     
     func part1() -> Any {
+        common().part1
+    }
+    
+    private func common() -> (part1: Int, part2: Int) {
         let input = entities
 
-        func dfs(path: [(Int, Int)], row: Int, col: Int, current: inout Set<Cell>) {
+        func dfs(path: [(Int, Int)], row: Int, col: Int, current: inout Set<Cell>) -> Int {
             guard 0..<input.count ~= row, 0..<input[row].count ~= col, path.count == input[row][col] else {
-                return
+                return 0
             }
             guard path.count < 9 else {
                 current.insert(.init(row, col))
-                return
+                return 1
             }
             let path = path + [(row, col)]
-            dfs(path: path, row: row + 1, col: col, current: &current)
-            dfs(path: path, row: row - 1, col: col, current: &current)
-            dfs(path: path, row: row, col: col + 1, current: &current)
-            dfs(path: path, row: row, col: col - 1, current: &current)
+            return dfs(path: path, row: row + 1, col: col, current: &current)
+                + dfs(path: path, row: row - 1, col: col, current: &current)
+                + dfs(path: path, row: row, col: col + 1, current: &current)
+                + dfs(path: path, row: row, col: col - 1, current: &current)
         }
 
-        var res = 0
+        var res1 = 0, res2 = 0
         for row in 0..<input.count {
             for col in 0..<input[row].count {
                 var ends = Set<Cell>()
-                dfs(path: [], row: row, col: col, current: &ends)
-                res += ends.count
+                res2 += dfs(path: [], row: row, col: col, current: &ends)
+                res1 += ends.count
             }
         }
 
-        return res
+        return (res1, res2)
     }
 }
