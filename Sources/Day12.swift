@@ -82,7 +82,7 @@ struct Day12: AdventDay {
                         if !new.satisfy(mR, nR) || input[new.r][new.c] != type {
                             visited[cell.r][cell.c] |= 1 << (i + 1)
                             // add a new perimeters side only if it's not presented in neighbours:
-                            p += (having >> (i + 1)) & 1 == 1 ? 0 : 1
+                            p += 1 - ((having >> (i + 1)) & 1)
                         }
                     }
 
