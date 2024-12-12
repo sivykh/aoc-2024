@@ -6,6 +6,14 @@ struct Cell: Hashable {
     let r: Int
     let c: Int
     init(_ r: Int, _ c: Int) { self.r = r; self.c = c }
+
+    static func +(lhs: Self, rhs: Self) -> Self {
+        return Cell(lhs.r + rhs.r, lhs.c + rhs.c)
+    }
+
+    func satisfy(_ rRange: Range<Int>, _ cRange: Range<Int>) -> Bool {
+        rRange ~= self.r && cRange ~= self.c
+    }
 }
 
 struct Day08: AdventDay {
