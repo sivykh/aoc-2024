@@ -2,6 +2,7 @@ import Foundation
 import Collections
 
 struct Machine {
+    // Cell is {x, y}
     let a: Cell, b: Cell, prize: Cell
 }
 
