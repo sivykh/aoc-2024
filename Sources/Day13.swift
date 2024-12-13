@@ -19,32 +19,16 @@ struct Day13: AdventDay {
     }
 
     func part1() -> Any {
-        var res = 0
-        for m in entities() {
-            let base = m.a.y * m.b.x - m.a.x * m.b.y
-            guard base != 0 else {
-                continue
-            }
-            let bTimesDouble = Double(m.a.y * m.prize.x - m.a.x * m.prize.y) / Double(base)
-            guard bTimesDouble >= 0, bTimesDouble == floor(bTimesDouble) else {
-                continue
-            }
-            let bTimes = Int(bTimesDouble)
-            let aTimesDouble = Double(m.prize.x - m.b.x * bTimes) / Double(m.a.x)
-            guard aTimesDouble >= 0, aTimesDouble == floor(aTimesDouble) else {
-                continue
-            }
-            guard bTimes < 101, aTimesDouble < 101 else {
-                continue
-            }
-            res += 3 * Int(aTimesDouble) + bTimes
-        }
-        return res
+        common(limit: 101)
     }
 
     func part2() -> Any {
+        common(add: 10000000000000)
+    }
+    
+    private func common(add: Int = 0, limit: Int = Int.max) -> Int {
         var res = 0
-        for m in entities(add: 10000000000000) {
+        for m in entities(add: add) {
             let base = m.a.y * m.b.x - m.a.x * m.b.y
             guard base != 0 else {
                 continue
@@ -58,8 +42,11 @@ struct Day13: AdventDay {
             guard aTimesDouble >= 0, aTimesDouble == floor(aTimesDouble) else {
                 continue
             }
-            
-            res += 3 * Int(aTimesDouble) + bTimes
+            let aTimes = Int(aTimesDouble)
+            guard bTimes < limit, aTimes < limit else {
+                continue
+            }
+            res += 3 * aTimes + bTimes
         }
         return res
     }
