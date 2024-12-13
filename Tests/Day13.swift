@@ -22,11 +22,11 @@ final class Day13Tests: XCTestCase {
 
     func testPart1() throws {
         let challenge = Day13(data: testData)
-        XCTAssertEqual(String(describing: challenge.part1()), "960")
+        XCTAssertEqual(String(describing: challenge.part1()), "480")
     }
 
     func testPart2() throws {
         let challenge = Day13(data: testData)
-        XCTAssertEqual(String(describing: challenge.part2()), "0")
+        XCTAssertEqual(String(describing: challenge.part2()), "875318608908")
     }
 }

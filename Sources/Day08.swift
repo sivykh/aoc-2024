@@ -6,6 +6,9 @@ struct Cell: Hashable {
     let r: Int
     let c: Int
     init(_ r: Int, _ c: Int) { self.r = r; self.c = c }
+    
+    var x: Int { r }
+    var y: Int { c }
 
     static func +(lhs: Self, rhs: Self) -> Self {
         return Cell(lhs.r + rhs.r, lhs.c + rhs.c)
