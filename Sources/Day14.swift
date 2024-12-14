@@ -1,4 +1,5 @@
 import Algorithms
+import Foundation
 import Collections
 
 struct Data14 {
@@ -38,31 +39,86 @@ struct Day14: AdventDay {
     
     func part2() -> Any {
         let input = entities
-        let wide = 101, tall = 103
-        // 7093
-        var pair = [6166, 6184]
-        
-        
-        
-        while pair[1] < 8000 {
-            for j in 0..<2 {
-                let second = pair[j]
-                var grid = [[Bool]](repeating: [Bool](repeating: false, count: wide), count: tall)
-                for data in input {
-                    let x = ((data.px + second * data.vx) % wide + wide) % wide
-                    let y = ((data.py + second * data.vy) % tall + tall) % tall
-                    grid[y][x] = true
-                }
-                for r in 0..<tall {
-                    for c in 0..<wide {
-                        print(grid[r][c] ? "#" : "_", terminator: "")
-                    }
-                    print()
-                }
-            }
-            pair[0] += tall
-            pair[1] += wide
+        var wide = 101, tall = 103
+        if input[0].px == 0 && input[0].py == 4 {
+            wide = 11
+            tall = 7
         }
-        return 0
+        let total = tall * wide
+        var time = 0
+        var timeIncrement = 1
+
+        while true {
+            func find(second: Int) -> Int {
+                var bathroom = [Bool](repeating: false, count: total)
+                for robot in input {
+                    let x = ((robot.px + second * robot.vx) % wide + wide) % wide
+                    let y = ((robot.py + second * robot.vy) % tall + tall) % tall
+                    bathroom[y * wide + x] = true
+                }
+
+                var visited = [Bool](repeating: false, count: total)
+                func dfs(_ r: Int, _ c: Int) -> Int {
+                    let index = r * wide + c
+                    guard 0..<total ~= index, bathroom[index], !visited[index] else {
+                        return 0
+                    }
+                    visited[index] = true
+                    return 1 + dfs(r + 1, c) + dfs(r - 1, c) + dfs(r, c + 1) + dfs(r, c - 1)
+                }
+
+                var maximum = 0
+                for j in 0..<total where bathroom[j] {
+                    maximum = max(maximum, dfs(j / wide, j % wide))
+                }
+                return maximum
+            }
+
+            let maximum = find(second: time)
+            if maximum > input.count / 3 {
+                break
+            } else if timeIncrement == 1 && maximum >= 10 {
+                let wm = find(second: time + wide)
+                let tm = find(second: time + tall)
+                timeIncrement = wm > tm ? wide : tall
+            }
+            time += timeIncrement
+        }
+        return time
     }
 }
+/*
+ ❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎
+ ❄︎                             ❄︎
+ ❄︎                             ❄︎
+ ❄︎                             ❄︎
+ ❄︎                             ❄︎
+ ❄︎              ❄︎              ❄︎
+ ❄︎             ❄︎❄︎❄︎             ❄︎
+ ❄︎            ❄︎❄︎❄︎❄︎❄︎            ❄︎
+ ❄︎           ❄︎❄︎❄︎❄︎❄︎❄︎❄︎           ❄︎
+ ❄︎          ❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎          ❄︎
+ ❄︎            ❄︎❄︎❄︎❄︎❄︎            ❄︎
+ ❄︎           ❄︎❄︎❄︎❄︎❄︎❄︎❄︎           ❄︎
+ ❄︎          ❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎          ❄︎
+ ❄︎         ❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎         ❄︎
+ ❄︎        ❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎        ❄︎
+ ❄︎          ❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎          ❄︎
+ ❄︎         ❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎         ❄︎
+ ❄︎        ❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎        ❄︎
+ ❄︎       ❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎       ❄︎
+ ❄︎      ❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎      ❄︎
+ ❄︎        ❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎        ❄︎
+ ❄︎       ❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎       ❄︎
+ ❄︎      ❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎      ❄︎
+ ❄︎     ❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎     ❄︎
+ ❄︎    ❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎    ❄︎
+ ❄︎             ❄︎❄︎❄︎             ❄︎
+ ❄︎             ❄︎❄︎❄︎             ❄︎
+ ❄︎             ❄︎❄︎❄︎             ❄︎
+ ❄︎                             ❄︎
+ ❄︎                             ❄︎
+ ❄︎                             ❄︎
+ ❄︎                             ❄︎
+ ❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎❄︎
+ */
