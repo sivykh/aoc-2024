@@ -37,6 +37,32 @@ struct Day14: AdventDay {
     }
     
     func part2() -> Any {
-        0
+        let input = entities
+        let wide = 101, tall = 103
+        // 7093
+        var pair = [6166, 6184]
+        
+        
+        
+        while pair[1] < 8000 {
+            for j in 0..<2 {
+                let second = pair[j]
+                var grid = [[Bool]](repeating: [Bool](repeating: false, count: wide), count: tall)
+                for data in input {
+                    let x = ((data.px + second * data.vx) % wide + wide) % wide
+                    let y = ((data.py + second * data.vy) % tall + tall) % tall
+                    grid[y][x] = true
+                }
+                for r in 0..<tall {
+                    for c in 0..<wide {
+                        print(grid[r][c] ? "#" : "_", terminator: "")
+                    }
+                    print()
+                }
+            }
+            pair[0] += tall
+            pair[1] += wide
+        }
+        return 0
     }
 }
