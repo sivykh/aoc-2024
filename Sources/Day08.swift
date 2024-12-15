@@ -17,6 +17,10 @@ struct Cell: Hashable {
     func satisfy(_ rRange: Range<Int>, _ cRange: Range<Int>) -> Bool {
         rRange ~= self.r && cRange ~= self.c
     }
+
+    func satisfy(_ rUp: Int, _ cUp: Int) -> Bool {
+        0..<rUp ~= self.r && 0..<cUp ~= self.c
+    }
 }
 
 struct Day08: AdventDay {
