@@ -1,3 +1,4 @@
+import Foundation
 import Algorithms
 import Collections
 
@@ -31,6 +32,16 @@ enum WHCellType: Character {
 
     var isBox: Bool {
         self == .box || self == .lbox || self == .rbox
+    }
+
+    var console: String {
+        switch self {
+        case .robot: return "\u{001b}[1m\u{001b}[31m\(rawValue)\u{001b}[0m"
+        case .lbox, .rbox: return "\u{001b}[36m\(rawValue)\u{001b}[0m"
+        case .wall: return "\u{001b}[40m\u{001b}[37m\(rawValue)\u{001b}[0m"
+        case .empty: return "\u{001b}[37m\(rawValue)\u{001b}[0m"
+        default: return "\(self.rawValue)"
+        }
     }
 }
 
@@ -93,6 +104,7 @@ struct Day15: AdventDay {
         var (robot, grid, directions) = entities2
         for direction in directions {
             robot = move2(cell: robot, direction: direction, grid: &grid)
+            printGrid(grid)
         }
         printGrid(grid)
 
@@ -106,13 +118,31 @@ struct Day15: AdventDay {
     }
 
     private func printGrid(_ grid: [[WHCellType]]) {
+        fflush(stdout)
+        usleep(50000)
+        _ = shell("tput sc")
         for row in 0..<grid.count {
             for col in 0..<grid[row].count {
-                print(grid[row][col].rawValue, terminator: "")
+                print(grid[row][col].console, terminator: "")
             }
-            print()
+            print("", terminator: "\n")
         }
-        print()
+        _ = shell("tput rc")
+    }
+
+    private func shell(_ command: String) -> String {
+        let task = Process()
+        task.launchPath = "/bin/bash"
+        task.arguments = ["-c", command]
+
+        let pipe = Pipe()
+        task.standardOutput = pipe
+        task.launch()
+
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        let output: String = NSString(data: data, encoding: String.Encoding.utf8.rawValue)! as String
+
+        return output
     }
 
     private func move(cell: Cell, direction: Direction, grid: inout [[WHCellType]]) -> Cell {
