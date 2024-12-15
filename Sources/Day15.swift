@@ -91,13 +91,10 @@ struct Day15: AdventDay {
     
     func part2() -> Any {
         var (robot, grid, directions) = entities2
-        printGrid(grid)
-        for (i, direction) in directions.enumerated() {
-            print("Move \(i):", direction.rawValue)
+        for direction in directions {
             robot = move2(cell: robot, direction: direction, grid: &grid)
-//            printGrid(grid)
         }
-
+        printGrid(grid)
 
         var res = 0
         for row in 0..<grid.count {
