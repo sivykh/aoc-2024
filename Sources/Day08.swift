@@ -14,6 +14,10 @@ struct Cell: Hashable {
         return Cell(lhs.r + rhs.r, lhs.c + rhs.c)
     }
 
+    static func -(lhs: Self, rhs: Self) -> Self {
+        return Cell(lhs.r - rhs.r, lhs.c - rhs.c)
+    }
+
     func satisfy(_ rRange: Range<Int>, _ cRange: Range<Int>) -> Bool {
         rRange ~= self.r && cRange ~= self.c
     }

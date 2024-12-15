@@ -39,6 +39,18 @@ final class Day15Tests: XCTestCase {
     v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^
     """
 
+    let testData3 = """
+    #######
+    #...#.#
+    #.....#
+    #..OO@#
+    #..O..#
+    #.....#
+    #######
+
+    <vv<<^^<<^^
+    """
+
     func testPart1() throws {
         let challenge = Day15(data: testData)
         XCTAssertEqual(String(describing: challenge.part1()), "2028")
@@ -50,7 +62,8 @@ final class Day15Tests: XCTestCase {
     }
 
     func testPart2() throws {
-        let challenge = Day15(data: testData)
-        XCTAssertEqual(String(describing: challenge.part2()), "0")
+        let challenge = Day15(data: testData2)
+        XCTAssertEqual(String(describing: challenge.part2()), "9021")
     }
 }
+
