@@ -104,7 +104,7 @@ struct Day15: AdventDay {
         var (robot, grid, directions) = entities2
         for direction in directions {
             robot = move2(cell: robot, direction: direction, grid: &grid)
-            printGrid(grid)
+            printGrid(grid, last: false)
         }
         printGrid(grid)
 
@@ -117,17 +117,18 @@ struct Day15: AdventDay {
         return res
     }
 
-    private func printGrid(_ grid: [[WHCellType]]) {
+    private func printGrid(_ grid: [[WHCellType]], last: Bool = true) {
         fflush(stdout)
-        usleep(50000)
-        _ = shell("tput sc")
+        usleep(10_000)
         for row in 0..<grid.count {
             for col in 0..<grid[row].count {
                 print(grid[row][col].console, terminator: "")
             }
-            print("", terminator: "\n")
+            print()
         }
-        _ = shell("tput rc")
+        if !last {
+            print(String(repeating: "\u{001b}[A", count: grid.count), terminator: "\r")
+        }
     }
 
     private func shell(_ command: String) -> String {
