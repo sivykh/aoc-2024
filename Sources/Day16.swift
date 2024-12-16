@@ -82,7 +82,7 @@ struct Day16: AdventDay {
         let (start, end, grid) = entities
         let m = grid.count
         let n = grid[0].count
-        let record = part1() as! Int
+        var record = Int.max
 
         var heap = Heap<Point>()
         heap.insert(Point(cell: start, dir: Direction.right, g: 0, h: dist(start, end)))
@@ -90,6 +90,9 @@ struct Day16: AdventDay {
         vis[start.r][start.c] = [0,0,0,0]
 
         while let popped = heap.popMin() {
+            if popped.cell == end {
+                record = min(record, popped.g)
+            }
             for direction in popped.dir.allButReversed {
                 let move = direction.move
                 let cell = popped.cell + move
