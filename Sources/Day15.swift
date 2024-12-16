@@ -20,6 +20,15 @@ enum Direction: Character, CaseIterable {
     var isVertical: Bool {
         self == .up || self == .down
     }
+    
+    var allButReversed: [Direction] {
+        switch self {
+        case .up: [.left, .up, .right]
+        case .down: [.left, .down, .right]
+        case .right: [.down, .up, .right]
+        case .left: [.left, .up, .down]
+        }
+    }
 
     var move: Cell {
         switch self {

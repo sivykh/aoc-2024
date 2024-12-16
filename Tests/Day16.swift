@@ -21,6 +21,24 @@ final class Day16Tests: XCTestCase {
     #S#.............#
     #################
     """
+    
+    let testData2 = """
+    ###############
+    #.......#....E#
+    #.#.###.#.###.#
+    #.....#.#...#.#
+    #.###.#####.#.#
+    #.#.#.......#.#
+    #.#.#####.###.#
+    #...........#.#
+    ###.#.#####.#.#
+    #...#.....#.#.#
+    #.#.#.###.#.#.#
+    #.....#...#.#.#
+    #.###.#.#.#.#.#
+    #S..#.....#...#
+    ###############
+    """
 
     func testPart1() throws {
         let challenge = Day16(data: testData)
@@ -29,6 +47,22 @@ final class Day16Tests: XCTestCase {
 
     func testPart2() throws {
         let challenge = Day16(data: testData)
-        XCTAssertEqual(String(describing: challenge.part2()), "0")
+        XCTAssertEqual(String(describing: challenge.part2()), "64")
+    }
+    
+    func test2Part2() throws {
+        let challenge = Day16(data: testData2)
+        XCTAssertEqual(String(describing: challenge.part2()), "45")
+    }
+    
+    func test3Part2() throws {
+        let challenge = Day16(data: """
+        ######
+        ##..E#
+        #...##
+        #S#..#
+        ######
+        """)
+        XCTAssertEqual(String(describing: challenge.part2()), "7")
     }
 }

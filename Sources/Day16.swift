@@ -19,6 +19,7 @@ private struct Point: Comparable, CustomStringConvertible {
 
     let cell: Cell
     let dir: Direction
+    let path: Set<Cell>
 
     /// Расстояние от начального узла до текущего узла
     let g: Int
@@ -49,7 +50,7 @@ struct Day16: AdventDay {
 
         let possibleDirections = Direction.allCases
         var heap = Heap<Point>()
-        heap.insert(Point(cell: start, dir: Direction.right, g: 0, h: dist(start)))
+        heap.insert(Point(cell: start, dir: Direction.right, path: [], g: 0, h: dist(start)))
         var closed: [[[Bool]]] = .init(repeating: .init(repeating: [false,false,false,false], count: n), count: m)
 
         while let popped = heap.popMin() {
@@ -60,20 +61,56 @@ struct Day16: AdventDay {
                 continue
             }
             closed[popped.cell.r][popped.cell.c][popped.dir.index] = true
-            for newDirection in possibleDirections {
+            for newDirection in popped.dir.allButReversed {
                 let move = newDirection.move
                 let nextCell = popped.cell + move
                 guard nextCell.satisfy(m, n), grid[nextCell.r][nextCell.c] != .wall else {
                     continue
                 }
                 let g = popped.g + 1 + (newDirection == popped.dir ? 0 : 1000)
-                heap.insert(Point(cell: nextCell, dir: newDirection, g: g, h: dist(nextCell)))
+                heap.insert(Point(cell: nextCell, dir: newDirection, path: [], g: g, h: dist(nextCell)))
             }
         }
         return 0
     }
     
     func part2() -> Any {
-        0
+        let (start, end, grid) = entities
+        let m = grid.count
+        let n = grid[0].count
+        let record = part1() as! Int
+
+        func dist(_ anyCell: Cell) -> Int { abs(anyCell.r - end.r) + abs(anyCell.c - end.c) }
+
+        var heap = Heap<Point>()
+        heap.insert(Point(cell: start, dir: Direction.right, path: [], g: 0, h: dist(start)))
+        var vis: [[[Int]]] = .init(repeating: .init(repeating: (0..<4).map { _ in Int.max }, count: n), count: m)
+        vis[start.r][start.c] = [0,0,0,0]
+        vis[end.r][end.c] = [record, record, record, record]
+
+        while let popped = heap.popMin() {
+            for direction in popped.dir.allButReversed {
+                let move = direction.move
+                let cell = popped.cell + move
+                guard cell.satisfy(m, n), grid[cell.r][cell.c] != .wall else {
+                    continue
+                }
+                let g = popped.g + 1 + (direction == popped.dir ? 0 : 1000)
+                guard g <= record else {
+                    continue
+                }
+                let point = Point(cell: cell, dir: direction, path: [], g: g, h: dist(cell))
+                if vis[cell.r][cell.c][direction.index] > g {
+                    vis[cell.r][cell.c][direction.index] = g
+                    heap.insert(point)
+                }
+            }
+        }
+        var total: Set<Cell> = [start]
+        heap.insert(Point(cell: start, dir: Direction.right, path: [], g: 0, h: dist(start)))
+        while let popped = heap.popMin() {
+            
+        }
+        return total.count
     }
 }
