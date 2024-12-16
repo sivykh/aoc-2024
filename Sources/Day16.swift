@@ -19,7 +19,6 @@ private struct Point: Comparable, Hashable, CustomStringConvertible {
 
     let cell: Cell
     let dir: Direction
-    let path: Set<Cell>
 
     /// Расстояние от начального узла до текущего узла
     let g: Int
@@ -49,7 +48,7 @@ struct Day16: AdventDay {
         func dist(_ anyCell: Cell) -> Int { abs(anyCell.r - end.r) + abs(anyCell.c - end.c) }
 
         var heap = Heap<Point>()
-        heap.insert(Point(cell: start, dir: Direction.right, path: [], g: 0, h: dist(start)))
+        heap.insert(Point(cell: start, dir: Direction.right, g: 0, h: dist(start)))
         var closed: [[[Bool]]] = .init(repeating: .init(repeating: [false,false,false,false], count: n), count: m)
 
         while let popped = heap.popMin() {
@@ -67,7 +66,7 @@ struct Day16: AdventDay {
                     continue
                 }
                 let g = popped.g + 1 + (newDirection == popped.dir ? 0 : 1000)
-                heap.insert(Point(cell: nextCell, dir: newDirection, path: [], g: g, h: dist(nextCell)))
+                heap.insert(Point(cell: nextCell, dir: newDirection, g: g, h: dist(nextCell)))
             }
         }
         return 0
@@ -82,7 +81,7 @@ struct Day16: AdventDay {
         func dist(_ anyCell: Cell) -> Int { abs(anyCell.r - end.r) + abs(anyCell.c - end.c) }
 
         var heap = Heap<Point>()
-        heap.insert(Point(cell: start, dir: Direction.right, path: [], g: 0, h: dist(start)))
+        heap.insert(Point(cell: start, dir: Direction.right, g: 0, h: dist(start)))
         var vis: [[[Int]]] = .init(repeating: .init(repeating: (0..<4).map { _ in Int.max }, count: n), count: m)
         vis[start.r][start.c] = [0,0,0,0]
 
@@ -97,7 +96,7 @@ struct Day16: AdventDay {
                 guard g <= record else {
                     continue
                 }
-                let point = Point(cell: cell, dir: direction, path: [], g: g, h: dist(cell))
+                let point = Point(cell: cell, dir: direction, g: g, h: dist(cell))
                 if vis[cell.r][cell.c][direction.index] > g {
                     vis[cell.r][cell.c][direction.index] = g
                     heap.insert(point)
@@ -109,7 +108,7 @@ struct Day16: AdventDay {
             if g != record {
                 return nil
             }
-            return Point(cell: end, dir: Direction(index: index), path: [], g: g, h: 0)
+            return Point(cell: end, dir: Direction(index: index), g: g, h: 0)
         }))
         while !queue.isEmpty {
             var next: Set<Point> = []
@@ -126,7 +125,7 @@ struct Day16: AdventDay {
                         guard vis[cell.r][cell.c][dir.index] == expected else {
                             continue
                         }
-                        next.insert(Point(cell: cell, dir: dir, path: [], g: expected, h: 0))
+                        next.insert(Point(cell: cell, dir: dir, g: expected, h: 0))
                     }
                 }
             }
