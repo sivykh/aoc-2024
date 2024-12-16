@@ -17,17 +17,31 @@ enum Direction: Character, CaseIterable {
         }
     }
 
+    init(index: Int) {
+        switch index {
+        case 0: self = .up
+        case 1: self = .down
+        case 2: self = .right
+        case 3: self = .left
+        default: fatalError()
+        }
+    }
+
+    var reversed: Direction {
+        switch self {
+        case .up: .down
+        case .down: .up
+        case .right: .left
+        case .left: .right
+        }
+    }
+
     var isVertical: Bool {
         self == .up || self == .down
     }
     
     var allButReversed: [Direction] {
-        switch self {
-        case .up: [.left, .up, .right]
-        case .down: [.left, .down, .right]
-        case .right: [.down, .up, .right]
-        case .left: [.left, .up, .down]
-        }
+        Direction.allCases.map({$0}).filter({ $0 != self.reversed })
     }
 
     var move: Cell {

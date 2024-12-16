@@ -8,7 +8,7 @@ enum Cell16Type: Character {
     case empty = "."
 }
 
-private struct Point: Comparable, CustomStringConvertible {
+private struct Point: Comparable, Hashable, CustomStringConvertible {
     static func < (lhs: Point, rhs: Point) -> Bool {
         lhs.f < rhs.f
     }
@@ -48,7 +48,6 @@ struct Day16: AdventDay {
 
         func dist(_ anyCell: Cell) -> Int { abs(anyCell.r - end.r) + abs(anyCell.c - end.c) }
 
-        let possibleDirections = Direction.allCases
         var heap = Heap<Point>()
         heap.insert(Point(cell: start, dir: Direction.right, path: [], g: 0, h: dist(start)))
         var closed: [[[Bool]]] = .init(repeating: .init(repeating: [false,false,false,false], count: n), count: m)
@@ -86,7 +85,6 @@ struct Day16: AdventDay {
         heap.insert(Point(cell: start, dir: Direction.right, path: [], g: 0, h: dist(start)))
         var vis: [[[Int]]] = .init(repeating: .init(repeating: (0..<4).map { _ in Int.max }, count: n), count: m)
         vis[start.r][start.c] = [0,0,0,0]
-        vis[end.r][end.c] = [record, record, record, record]
 
         while let popped = heap.popMin() {
             for direction in popped.dir.allButReversed {
@@ -106,10 +104,33 @@ struct Day16: AdventDay {
                 }
             }
         }
-        var total: Set<Cell> = [start]
-        heap.insert(Point(cell: start, dir: Direction.right, path: [], g: 0, h: dist(start)))
-        while let popped = heap.popMin() {
-            
+        var total: Set<Cell> = []
+        var queue: Set<Point> = Set(vis[end.r][end.c].enumerated().compactMap( { index, g in
+            if g != record {
+                return nil
+            }
+            return Point(cell: end, dir: Direction(index: index), path: [], g: g, h: 0)
+        }))
+        while !queue.isEmpty {
+            var next: Set<Point> = []
+            for point in queue {
+                total.insert(point.cell)
+                for direction in point.dir.allButReversed {
+                    let move = direction.reversed.move
+                    let cell = point.cell + move
+                    guard cell.satisfy(m, n), grid[cell.r][cell.c] != .wall else {
+                        continue
+                    }
+                    for dir in direction.allButReversed {
+                        let expected = point.g - 1 - (dir == point.dir ? 0 : 1000)
+                        guard vis[cell.r][cell.c][dir.index] == expected else {
+                            continue
+                        }
+                        next.insert(Point(cell: cell, dir: dir, path: [], g: expected, h: 0))
+                    }
+                }
+            }
+            queue = next
         }
         return total.count
     }
