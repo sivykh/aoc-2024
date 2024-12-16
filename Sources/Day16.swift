@@ -1,3 +1,4 @@
+import Foundation
 import Algorithms
 import Collections
 
@@ -6,7 +7,19 @@ enum Cell16Type: Character {
     case end = "E"
     case wall = "#"
     case empty = "."
+
+    var console: String {
+        switch self {
+        case .start: return "\u{001b}[1m\u{001b}[31m\(rawValue)\u{001b}[0m"
+        case .end: return "\u{001b}[1m\u{001b}[32m\(rawValue)\u{001b}[0m"
+        case .wall: return "\u{001b}[40m\u{001b}[37m\(rawValue)\u{001b}[0m"
+        case .empty: return "\u{001b}[37m\(rawValue)\u{001b}[0m"
+        }
+    }
 }
+
+private let visited = "\u{001b}[1m\u{001b}[41m\("  ")\u{001b}[0m"
+private let complete = "\u{001b}[37m\u{001b}[42m\("  ")\u{001b}[0m"
 
 private struct Point: Comparable, Hashable, CustomStringConvertible {
     static func < (lhs: Point, rhs: Point) -> Bool {
@@ -77,7 +90,30 @@ struct Day16: AdventDay {
         }
         return 0
     }
-    
+
+    private func printGrid(_ grid: [[Cell16Type]], vis: [[[Int]]], total: Set<Cell>, last: Bool = false) {
+        fflush(stdout)
+        let m = grid.count, n = grid[0].count
+        for row in 0..<m {
+            for col in 0..<n {
+                if grid[row][col] == .start || grid[row][col] == .end {
+                    print(grid[row][col].console, terminator: "")
+                } else if total.contains(Cell(row, col)) {
+                    print(complete, terminator: "")
+                } else if !vis[row][col].filter({ $0 != Int.max }).isEmpty {
+                    print(visited, terminator: "")
+                } else {
+                    print(grid[row][col].console, terminator: "")
+                    print(grid[row][col].console, terminator: "")
+                }
+            }
+            print()
+        }
+        if !last {
+            print(String(repeating: "\u{001b}[A", count: m), terminator: "\r")
+        }
+    }
+
     func part2() -> Any {
         let (start, end, grid) = entities
         let m = grid.count
@@ -89,7 +125,12 @@ struct Day16: AdventDay {
         var vis: [[[Int]]] = .init(repeating: .init(repeating: (0..<4).map { _ in Int.max }, count: n), count: m)
         vis[start.r][start.c] = [0,0,0,0]
 
+        var iter = 0
         while let popped = heap.popMin() {
+            if iter % 75 == 0 {
+                printGrid(grid, vis: vis, total: [])
+            }
+            iter += 1
             if popped.cell == end {
                 record = min(record, popped.g)
             }
@@ -110,6 +151,7 @@ struct Day16: AdventDay {
                 }
             }
         }
+        printGrid(grid, vis: vis, total: [])
         var total: Set<Cell> = []
         var queue: Set<Point> = Set(vis[end.r][end.c].enumerated().compactMap( { index, g in
             if g != record {
@@ -118,6 +160,8 @@ struct Day16: AdventDay {
             return Point(cell: end, dir: Direction(index: index), g: g, h: 0)
         }))
         while !queue.isEmpty {
+            printGrid(grid, vis: vis, total: total)
+            iter += 1
             var next: Set<Point> = []
             for point in queue {
                 total.insert(point.cell)
@@ -138,6 +182,7 @@ struct Day16: AdventDay {
             }
             queue = next
         }
+        printGrid(grid, vis: vis, total: total, last: true)
         return total.count
     }
 }
