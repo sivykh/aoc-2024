@@ -2,11 +2,20 @@ import Foundation
 import Algorithms
 import Collections
 
-enum Direction: Character {
+enum Direction: Character, CaseIterable {
     case up = "^"
     case down = "v"
     case left = "<"
     case right = ">"
+
+    var index: Int {
+        switch self {
+        case .up: 0
+        case .down: 1
+        case .right: 2
+        case .left: 3
+        }
+    }
 
     var isVertical: Bool {
         self == .up || self == .down
@@ -118,13 +127,8 @@ struct Day15: AdventDay {
     }
 
     private func printGrid(_ grid: [[WHCellType]], last: Bool = true) {
-        fflush(stdout)
-        usleep(10_000)
         for row in 0..<grid.count {
-            for col in 0..<grid[row].count {
-                print(grid[row][col].console, terminator: "")
-            }
-            print()
+            print(grid[row].map({ $0.console }).joined())
         }
         if !last {
             print(String(repeating: "\u{001b}[A", count: grid.count), terminator: "\r")
