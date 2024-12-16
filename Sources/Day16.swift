@@ -39,16 +39,22 @@ struct Day16: AdventDay {
         let end = product(0..<m, 0..<n).first(where: { grid[$0.0][$0.1] == .end })!
         return (Cell(start.0, start.1), Cell(end.0, end.1), grid)
     }
-    
+
+    func dist(_ cell: Cell, _ end: Cell) -> Int {
+        let l = abs(cell.r - end.r) + abs(cell.c - end.c)
+        if cell.r != end.r && cell.c != end.c {
+            return l + 1000
+        }
+        return l
+    }
+
     func part1() -> Any {
         let (start, end, grid) = entities
         let m = grid.count
         let n = grid[0].count
 
-        func dist(_ anyCell: Cell) -> Int { abs(anyCell.r - end.r) + abs(anyCell.c - end.c) }
-
         var heap = Heap<Point>()
-        heap.insert(Point(cell: start, dir: Direction.right, g: 0, h: dist(start)))
+        heap.insert(Point(cell: start, dir: Direction.right, g: 0, h: dist(start, end)))
         var closed: [[[Bool]]] = .init(repeating: .init(repeating: [false,false,false,false], count: n), count: m)
 
         while let popped = heap.popMin() {
@@ -66,7 +72,7 @@ struct Day16: AdventDay {
                     continue
                 }
                 let g = popped.g + 1 + (newDirection == popped.dir ? 0 : 1000)
-                heap.insert(Point(cell: nextCell, dir: newDirection, g: g, h: dist(nextCell)))
+                heap.insert(Point(cell: nextCell, dir: newDirection, g: g, h: dist(nextCell, end)))
             }
         }
         return 0
@@ -78,10 +84,8 @@ struct Day16: AdventDay {
         let n = grid[0].count
         let record = part1() as! Int
 
-        func dist(_ anyCell: Cell) -> Int { abs(anyCell.r - end.r) + abs(anyCell.c - end.c) }
-
         var heap = Heap<Point>()
-        heap.insert(Point(cell: start, dir: Direction.right, g: 0, h: dist(start)))
+        heap.insert(Point(cell: start, dir: Direction.right, g: 0, h: dist(start, end)))
         var vis: [[[Int]]] = .init(repeating: .init(repeating: (0..<4).map { _ in Int.max }, count: n), count: m)
         vis[start.r][start.c] = [0,0,0,0]
 
@@ -96,7 +100,7 @@ struct Day16: AdventDay {
                 guard g <= record else {
                     continue
                 }
-                let point = Point(cell: cell, dir: direction, g: g, h: dist(cell))
+                let point = Point(cell: cell, dir: direction, g: g, h: dist(cell, end))
                 if vis[cell.r][cell.c][direction.index] > g {
                     vis[cell.r][cell.c][direction.index] = g
                     heap.insert(point)
