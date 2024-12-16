@@ -20,11 +20,11 @@ private struct Point: Comparable, Hashable, CustomStringConvertible {
     let cell: Cell
     let dir: Direction
 
-    /// Расстояние от начального узла до текущего узла
+    /// distance from the start
     let g: Int
-    /// Примерное расстояние от текущего узла до конечного узла
+    /// estimated distance left
     let h: Int
-    /// Сумма g и h
+    /// Sum of `g` and `h`
     var f: Int { g + h }
 }
 
