@@ -139,37 +139,37 @@ struct Day17: AdventDay {
         return find()
         
 //        let computer = entities
+//        print(computer.bit3, "\n")
 //        let b = computer.b, c = computer.c
 //        var degrees = [1]
 //        for j in 1..<computer.bit3.count {
 //            degrees.append(degrees[j - 1] * 8)
 //        }
 //        var initial = degrees[15] * 3
-//        initial += degrees[14] * 7
+//        initial += degrees[14] * 0 // 0 | 7
 //        initial += degrees[13] * 7
-//        initial += degrees[12] * 4
+//        initial += degrees[12] * 4 // 2 | 4
 //        initial += degrees[11] * 1
 //        initial += degrees[10] * 0 // 0 || 5
 //        initial += degrees[9] * 3
-//        initial += degrees[8] * 3 // 3 5
-//        initial += degrees[7] * 1 // 1 5
+//        initial += degrees[8] * 3 // 2 3 5
+//        initial += degrees[7] * 1 // 1 | 5
 //        initial += degrees[6] * 3
 //        initial += degrees[5] * 3
 //        initial += degrees[4] * 2
 //        initial += degrees[3] * 2
 //        initial += degrees[2] * 3
-//        initial += degrees[1] * 4 // 140471656359136
+//        initial += degrees[1] * 4 // 109685330781408
 //
-//        computer.a = initial
-//        computer.b = b
-//        computer.c = c
-//        computer.output = []
-//        computer.work()
-//
-//        if computer.output == computer.bit3 {
+//        for j in 0..<8 {
+//            computer.a = initial
+//            computer.b = b
+//            computer.c = c
+//            computer.output = []
+//            computer.work()
+//            
 //            print(computer.output)
-//            print(computer.bit3)
-//            return initial
+//            initial += degrees[1]
 //        }
 //        
 //        return 0
