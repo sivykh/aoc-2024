@@ -25,13 +25,15 @@ final class Computer17 {
 
     let program: [Operation17]
     let rawProgram: String
+    let bit3: [Int]
 
     var output: [Int] = []
 
-    init(a: Int, b: Int, c: Int, program: [Operation17]) {
+    init(a: Int, b: Int, c: Int, bit3: [Int], program: [Operation17]) {
         self.a = a
         self.b = b
         self.c = c
+        self.bit3 = bit3
         self.program = program
         self.rawProgram = program.flatMap({ [$0.command.rawValue, $0.operand] }).map({ "\($0)" }).joined(separator: ",")
     }
@@ -101,7 +103,7 @@ struct Day17: AdventDay {
         for i in stride(from: 0, to: bit3.count, by: 2) {
             program.append(Operation17(command: Command17(rawValue: bit3[i])!, operand: bit3[i + 1]))
         }
-        return Computer17(a: Int(a)!, b: Int(b)!, c: Int(c)!, program: program)
+        return Computer17(a: Int(a)!, b: Int(b)!, c: Int(c)!, bit3: bit3, program: program)
     }
 
     func part1() -> Any {
@@ -112,15 +114,64 @@ struct Day17: AdventDay {
     
     func part2() -> Any {
         let computer = entities
-        var initial = 1
-        while true {
-            computer.a = initial
-            computer.work()
-            let outputString = computer.output.map({"\($0)"}).joined(separator: ",")
-            if outputString == computer.rawProgram {
-                return initial
+        let b = computer.b, c = computer.c
+        func find(a: Int = 0, depth: Int = 0) -> Int {
+            if depth == computer.bit3.count {
+                return a
             }
-            initial += 1
+            for i in 0..<8 {
+                let initial = 8 * a + i
+                computer.a = initial
+                computer.b = b
+                computer.c = c
+                computer.output = []
+                computer.work()
+                if computer.output[0] == computer.bit3[computer.bit3.count - 1 - depth] {
+                    let found = find(a: initial, depth: depth + 1)
+                    if found != 0 {
+                        return found
+                    }
+                }
+            }
+            return 0
         }
+        
+        return find()
+        
+//        let computer = entities
+//        let b = computer.b, c = computer.c
+//        var degrees = [1]
+//        for j in 1..<computer.bit3.count {
+//            degrees.append(degrees[j - 1] * 8)
+//        }
+//        var initial = degrees[15] * 3
+//        initial += degrees[14] * 7
+//        initial += degrees[13] * 7
+//        initial += degrees[12] * 4
+//        initial += degrees[11] * 1
+//        initial += degrees[10] * 0 // 0 || 5
+//        initial += degrees[9] * 3
+//        initial += degrees[8] * 3 // 3 5
+//        initial += degrees[7] * 1 // 1 5
+//        initial += degrees[6] * 3
+//        initial += degrees[5] * 3
+//        initial += degrees[4] * 2
+//        initial += degrees[3] * 2
+//        initial += degrees[2] * 3
+//        initial += degrees[1] * 4 // 140471656359136
+//
+//        computer.a = initial
+//        computer.b = b
+//        computer.c = c
+//        computer.output = []
+//        computer.work()
+//
+//        if computer.output == computer.bit3 {
+//            print(computer.output)
+//            print(computer.bit3)
+//            return initial
+//        }
+//        
+//        return 0
     }
 }
