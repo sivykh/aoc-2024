@@ -3,14 +3,7 @@ import Algorithms
 import Collections
 
 enum Command17: Int {
-    case adv = 0
-    case bxl = 1
-    case bst = 2
-    case jnz = 3
-    case bxc = 4
-    case out = 5
-    case bdv = 6
-    case cdv = 7
+    case adv, bxl, bst, jnz, bxc, out, bdv, cdv
 }
 
 struct Operation17 {
@@ -18,14 +11,10 @@ struct Operation17 {
     let operand: Int
 }
 
-final class Computer17 {
-    var a: Int
-    var b: Int
-    var c: Int
-
-    let program: [Operation17]
-    let rawProgram: String
+struct Computer17 {
+    var a: Int, b: Int, c: Int
     let bit3: [Int]
+    let program: [Operation17]
 
     var output: [Int] = []
 
@@ -35,7 +24,6 @@ final class Computer17 {
         self.c = c
         self.bit3 = bit3
         self.program = program
-        self.rawProgram = program.flatMap({ [$0.command.rawValue, $0.operand] }).map({ "\($0)" }).joined(separator: ",")
     }
 
     /// The value of a combo operand can be found as follows:
@@ -47,52 +35,40 @@ final class Computer17 {
     private func combo(operand: Int) -> Int? {
         switch operand {
         case 0...3: return operand
-        case 4: return self.a
-        case 5: return self.b
-        case 6: return self.c
+        case 4: return a
+        case 5: return b
+        case 6: return c
         default:
             return nil
         }
     }
 
-    func work() {
+    mutating func work() -> [Int] {
         var pointer = 0
-        while pointer < self.program.count {
-            let instruction = self.program[pointer]
+        while pointer < program.count {
+            let instruction = program[pointer]
             let comboValue = combo(operand: instruction.operand)
             var nextPointer = pointer + 1
             switch instruction.command {
-            case .adv:
-                let denominator = Int(pow(2, Double(comboValue!)))
-                self.a = self.a / denominator
-            case .bxl:
-                self.b = self.b ^ instruction.operand
-            case .bst:
-                self.b = comboValue! % 8
-            case .jnz:
-                if self.a != 0 {
-                    nextPointer = instruction.operand / 2
-                }
-            case .bxc:
-                self.b = self.b ^ self.c
-            case .out:
-                self.output.append(comboValue! % 8)
-            case .bdv:
-                let denominator = Int(pow(2, Double(comboValue!)))
-                self.b = self.a / denominator
-            case .cdv:
-                let denominator = Int(pow(2, Double(comboValue!)))
-                self.c = self.a / denominator
+            case .adv: a = a / Int(pow(2, Double(comboValue!)))
+            case .bxl: b = b ^ instruction.operand
+            case .bst: b = comboValue! % 8
+            case .jnz: nextPointer = a != 0 ? instruction.operand / 2 : nextPointer
+            case .bxc: b = b ^ c
+            case .out: output.append(comboValue! % 8)
+            case .bdv: b = a / Int(pow(2, Double(comboValue!)))
+            case .cdv: c = a / Int(pow(2, Double(comboValue!)))
             }
             pointer = nextPointer
         }
+        return output
     }
 }
 
 struct Day17: AdventDay {
     var data: String
     
-    var entities: Computer17 {
+    var entity: Computer17 {
         let splitted = data.components(separatedBy: "\n\n")
         let registers = splitted[0].components(separatedBy: "\n")
         let a = registers[0].components(separatedBy: ": ")[1]
@@ -107,38 +83,37 @@ struct Day17: AdventDay {
     }
 
     func part1() -> Any {
-        let computer = entities
-        computer.work()
-        return computer.output.map({"\($0)"}).joined(separator: ",")
+        var computer = entity
+        return computer.work().map({"\($0)"}).joined(separator: ",")
     }
     
     func part2() -> Any {
-        let computer = entities
-        let b = computer.b, c = computer.c
-        func find(a: Int = 0, depth: Int = 0) -> Int {
-            if depth == computer.bit3.count {
+        let input = entity
+        var degrees = [1]
+        for j in 1..<input.bit3.count {
+            degrees.append(degrees[j - 1] * 8)
+        }
+        
+        func find(a: Int, j: Int) -> Int? {
+            if j < 0 {
                 return a
             }
-            for i in 0..<8 {
-                let initial = 8 * a + i
+            for i in 0..<8 where a > 0 || i > 0 {
+                let initial = a + i * degrees[j]
+                var computer = input
                 computer.a = initial
-                computer.b = b
-                computer.c = c
-                computer.output = []
-                computer.work()
-                if computer.output[0] == computer.bit3[computer.bit3.count - 1 - depth] {
-                    let found = find(a: initial, depth: depth + 1)
-                    if found != 0 {
+                if computer.work()[j] == computer.bit3[j] {
+                    if let found = find(a: initial, j: j - 1) {
                         return found
                     }
                 }
             }
-            return 0
+            return nil
         }
+
+        return find(a: 0, j: input.bit3.count - 1) ?? -1
         
-        return find()
-        
-//        let computer = entities
+//        let computer = entity
 //        print(computer.bit3, "\n")
 //        let b = computer.b, c = computer.c
 //        var degrees = [1]
