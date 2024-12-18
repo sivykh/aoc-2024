@@ -53,13 +53,17 @@ struct Day18: AdventDay {
 
     func part2() -> Any {
         let cells = entities
-        for steps in 1024... {
-            if common(cells: cells.prefix(steps), prints: true) == nil {
-                let cell = cells[steps]
-                return "\(cell.c),\(cell.r)"
+        var l = 1024, r = cells.count - 1
+        while l <= r {
+            let steps = (l + r) / 2
+            if common(cells: cells.prefix(steps), prints: false) == nil {
+                r = steps - 1
+            } else {
+                l = steps + 1
             }
         }
-        return 0
+        let cell = cells[max(l, r) - 1]
+        return "\(cell.c),\(cell.r)"
     }
 
     private func common(cells: ArraySlice<Cell>, prints: Bool = false) -> Int? {
