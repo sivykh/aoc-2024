@@ -31,12 +31,20 @@ final class Day18Tests: XCTestCase {
     """
 
     func testPart1() throws {
-        let challenge = Day18(data: testData)
-        XCTAssertEqual(String(describing: challenge.part1()), "0")
+        var challenge = Day18(data: testData)
+        challenge.testBound = [
+            Cell(7, 0), Cell(7, 1), Cell(7, 2), Cell(7, 3), Cell(7, 4), Cell(7, 5), Cell(7, 6), Cell(7, 7),
+            Cell(0, 7), Cell(1, 7), Cell(2, 7), Cell(3, 7), Cell(4, 7), Cell(5, 7),
+        ]
+        XCTAssertEqual(String(describing: challenge.part1()), "150")
     }
 
     func testPart2() throws {
-        let challenge = Day18(data: testData)
-        XCTAssertEqual(String(describing: challenge.part2()), "0")
+        var challenge = Day18(data: testData)
+        challenge.testBound = [
+            Cell(7, 0), Cell(7, 1), Cell(7, 2), Cell(7, 3), Cell(7, 4), Cell(7, 5), Cell(7, 6), Cell(7, 7),
+            Cell(0, 7), Cell(1, 7), Cell(2, 7), Cell(3, 7), Cell(4, 7), Cell(5, 7),
+        ]
+        XCTAssertEqual(String(describing: challenge.part2()), "6,1")
     }
 }

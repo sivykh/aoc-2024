@@ -36,24 +36,32 @@ private struct Point: Comparable, Hashable, CustomStringConvertible {
 
 
 struct Day18: AdventDay {
-    var data: String
+    init(data: String) {
+        self.data = data
+    }
+    
+    let data: String
+    
+    var testBound: [Cell] = []
     
     var entities: [Cell] {
-        data.split(separator: "\n").map {
+        let input = data.split(separator: "\n").map {
             let sub = $0.split(separator: ",")
             return Cell(Int(sub[1])!, Int(sub[0])!)
         }
+        return testBound + input
     }
 
     private func dist(_ cell: Cell, _ end: Cell) -> Int { abs(cell.r - end.r) + abs(cell.c - end.c) }
 
     func part1() -> Any {
-        common(cells: entities.prefix(1024))!
+        let steps = testBound.isEmpty ? 1024 : 12
+        return common(cells: entities.prefix(testBound.count + steps))!
     }
 
     func part2() -> Any {
         let cells = entities
-        var l = 1024, r = cells.count - 1
+        var l = testBound.isEmpty ? 1024 : testBound.count + 12, r = cells.count - 1
         while l <= r {
             let steps = (l + r) / 2
             if common(cells: cells.prefix(steps), prints: false) == nil {
