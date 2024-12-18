@@ -125,12 +125,7 @@ struct Day16: AdventDay {
         var vis: [[[Int]]] = .init(repeating: .init(repeating: (0..<4).map { _ in Int.max }, count: n), count: m)
         vis[start.r][start.c] = [0,0,0,0]
 
-        var iter = 0
         while let popped = heap.popMin() {
-            if iter % 75 == 0 {
-                printGrid(grid, vis: vis, total: [])
-            }
-            iter += 1
             if popped.cell == end {
                 record = min(record, popped.g)
             }
@@ -151,7 +146,7 @@ struct Day16: AdventDay {
                 }
             }
         }
-        printGrid(grid, vis: vis, total: [])
+
         var total: Set<Cell> = []
         var queue: Set<Point> = Set(vis[end.r][end.c].enumerated().compactMap( { index, g in
             if g != record {
@@ -160,8 +155,6 @@ struct Day16: AdventDay {
             return Point(cell: end, dir: Direction(index: index), g: g, h: 0)
         }))
         while !queue.isEmpty {
-            printGrid(grid, vis: vis, total: total)
-            iter += 1
             var next: Set<Point> = []
             for point in queue {
                 total.insert(point.cell)
@@ -182,7 +175,6 @@ struct Day16: AdventDay {
             }
             queue = next
         }
-        printGrid(grid, vis: vis, total: total, last: true)
         return total.count
     }
 }
