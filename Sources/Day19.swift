@@ -14,15 +14,42 @@ private struct Input19 {
     let towels: [Towel19]
 }
 
+private let newlineCode: Int8 = 10 // "\n"
+private let commaCode: Int8 = 44 // ","
+private let whitespaceCode: Int8 = 32 // " "
 
 struct Day19: AdventDay {
     var data: String
     
     fileprivate var entities: Input19 {
-        let splitted = data.components(separatedBy: "\n\n")
-        let patterns = splitted[0].components(separatedBy: ", ").map { Pattern19(colors: $0.utf8CString.dropLast()) }
-        let towels = splitted[1].components(separatedBy: "\n").map { Towel19(pattern: $0.utf8CString.dropLast()) }
-        return Input19(patterns: patterns, towels: towels)
+        let input = data.utf8CString
+        var i = 0, j = 0
+        var patterns: [[Int8]] = [[]]
+        while input[i] != newlineCode {
+            if input[i] != whitespaceCode && input[i] != commaCode {
+                patterns[j].append(input[i])
+            } else if input[i] != commaCode {
+                patterns.append([])
+                j += 1
+            }
+            i += 1
+        }
+        i += 2 // two newlines
+        j = 0
+        var towels: [[Int8]] = [[]]
+        while input[i] != 0 {
+            if input[i] != newlineCode {
+                towels[j].append(input[i])
+            } else {
+                towels.append([])
+                j += 1
+            }
+            i += 1
+        }
+        if towels.last?.isEmpty == true {
+            towels.removeLast()
+        }
+        return Input19(patterns: patterns.map(Pattern19.init(colors:)), towels: towels.map(Towel19.init(pattern:)))
     }
     
     func part1() -> Any {
@@ -61,6 +88,25 @@ struct Day19: AdventDay {
     
     func part2() -> Any {
         let input = entities
-        return input.towels.count
+        var res = 0
+        for towel in input.towels {
+            var dp = [Int](repeating: 0, count: towel.pattern.count + 1)
+            dp[0] = 1
+            for i in 1...towel.pattern.count {
+                for pattern in input.patterns where i >= pattern.colors.count {
+                    var good = true
+                    let offset = i - pattern.colors.count
+                    for j in 0..<pattern.colors.count where towel.pattern[offset + j] != pattern.colors[j] {
+                        good = false
+                        break
+                    }
+                    if good {
+                        dp[i] += dp[offset]
+                    }
+                }
+            }
+            res += dp[towel.pattern.count]
+        }
+        return res
     }
 }
