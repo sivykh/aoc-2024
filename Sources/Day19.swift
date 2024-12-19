@@ -1,4 +1,4 @@
-import Algorithms
+import Foundation
 import Collections
 
 private struct Pattern19 {
@@ -31,13 +31,18 @@ struct Day19: AdventDay {
         func backtrack(towel i: Int, from position: Int) -> Bool {
             let towelPattern = input.towels[i].pattern
             for pattern in input.patterns {
-                guard towelPattern.count - 1 - position >= pattern.colors.count else {
+                guard towelPattern.count - position >= pattern.colors.count else {
                     continue
                 }
-                guard Array(input.towels[i].pattern[position..<(position + pattern.colors.count)]) == pattern.colors else {
+                var good = true
+                for j in 0..<pattern.colors.count where input.towels[i].pattern[position + j] != pattern.colors[j] {
+                    good = false
+                    break
+                }
+                guard good else {
                     continue
                 }
-                if towelPattern.count - 1 - position == pattern.colors.count {
+                if towelPattern.count - position == pattern.colors.count {
                     return true
                 }
                 if backtrack(towel: i, from: position + pattern.colors.count) {
@@ -56,31 +61,6 @@ struct Day19: AdventDay {
     
     func part2() -> Any {
         let input = entities
-
-        func backtrack(towel i: Int, from position: Int) -> Int {
-            let towelPattern = input.towels[i].pattern
-            var res = 0
-            for pattern in input.patterns {
-                guard towelPattern.count - 1 - position >= pattern.colors.count else {
-                    continue
-                }
-                guard Array(input.towels[i].pattern[position..<(position + pattern.colors.count)]) == pattern.colors else {
-                    continue
-                }
-                if towelPattern.count - 1 - position == pattern.colors.count {
-                    res += 1
-                }
-                res += backtrack(towel: i, from: position + pattern.colors.count)
-            }
-            return res
-        }
-
-        var res = 0
-        for towel in input.towels.enumerated() {
-            let value = backtrack(towel: towel.offset, from: 0)
-            print(towel.offset, ":", value)
-            res += value
-        }
-        return res
+        return input.towels.count
     }
 }
