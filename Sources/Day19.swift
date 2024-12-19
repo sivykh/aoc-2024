@@ -48,13 +48,39 @@ struct Day19: AdventDay {
         }
 
         var res = 0
-        for towel in input.towels.enumerated() where backtrack(towel: towel.offset, from: 0){
+        for towel in input.towels.enumerated() where backtrack(towel: towel.offset, from: 0) {
             res += 1
         }
         return res
     }
     
     func part2() -> Any {
-        0
+        let input = entities
+
+        func backtrack(towel i: Int, from position: Int) -> Int {
+            let towelPattern = input.towels[i].pattern
+            var res = 0
+            for pattern in input.patterns {
+                guard towelPattern.count - 1 - position >= pattern.colors.count else {
+                    continue
+                }
+                guard Array(input.towels[i].pattern[position..<(position + pattern.colors.count)]) == pattern.colors else {
+                    continue
+                }
+                if towelPattern.count - 1 - position == pattern.colors.count {
+                    res += 1
+                }
+                res += backtrack(towel: i, from: position + pattern.colors.count)
+            }
+            return res
+        }
+
+        var res = 0
+        for towel in input.towels.enumerated() {
+            let value = backtrack(towel: towel.offset, from: 0)
+            print(towel.offset, ":", value)
+            res += value
+        }
+        return res
     }
 }
