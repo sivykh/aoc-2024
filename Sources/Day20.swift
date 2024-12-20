@@ -103,34 +103,39 @@ struct Day20: AdventDay {
         return total
     }
 
-    private func commonPart(start: Cell, end: Cell, grid: [[Cell20Type]], up: Int, atLeast: Int) -> Int {
+    private func commonPart(start: Cell, end: Cell, grid: [[Cell20Type]], up: Int, atLeast: Int) async -> Int {
         let path = solve(start: start, end: end, grid: grid)
-        var res = 0
-        for from in 0..<(path.count - 2) {
-            for to in (from + 1)..<path.count where dist(path[from], path[to]) <= up {
-                let distance = to - from
-                let newDistance = dist(path[from], path[to])
-                if distance - newDistance > atLeast {
-                    res += 1
+        return await withTaskGroup(of: Int.self, returning: Int.self) { group in
+            for from in 0..<(path.count - atLeast - 1) {
+                group.addTask {
+                    var res = 0
+                    for to in (from + atLeast)..<path.count where dist(path[from], path[to]) <= up {
+                        let distance = to - from
+                        let newDistance = dist(path[from], path[to])
+                        if distance - newDistance > atLeast {
+                            res += 1
+                        }
+                    }
+                    return res
                 }
             }
+            return await group.reduce(0, +)
         }
-        return res
     }
 
-    func part1() -> Any {
+    func part1() async -> Any {
         let (start, end, grid) = entities
         if !isTest {
-            return commonPart(start: start, end: end, grid: grid, up: 2, atLeast: 99)
+            return await commonPart(start: start, end: end, grid: grid, up: 2, atLeast: 99)
         }
-        return commonPart(start: start, end: end, grid: grid, up: 2, atLeast: 9)
+        return await commonPart(start: start, end: end, grid: grid, up: 2, atLeast: 9)
     }
     
-    func part2() -> Any {
+    func part2() async -> Any {
         let (start, end, grid) = entities
         if !isTest {
-            return commonPart(start: start, end: end, grid: grid, up: 20, atLeast: 99)
+            return await commonPart(start: start, end: end, grid: grid, up: 20, atLeast: 99)
         }
-        return commonPart(start: start, end: end, grid: grid, up: 20, atLeast: 69)
+        return await commonPart(start: start, end: end, grid: grid, up: 20, atLeast: 69)
     }
 }
