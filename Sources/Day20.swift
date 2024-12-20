@@ -24,6 +24,14 @@ private struct Point: Comparable, Hashable, CustomStringConvertible {
 
 struct Day20: AdventDay {
     var data: String
+    var isTest = false
+    init(data: String) {
+        self.data = data
+    }
+    init(data: String, isTest: Bool) {
+        self.data = data
+        self.isTest = isTest
+    }
 
     var entities: (start: Cell, end: Cell, grid: [[Cell20Type]]) {
         let grid = data.components(separatedBy: "\n").map { $0.compactMap(Cell16Type.init(rawValue:)) }
@@ -95,35 +103,34 @@ struct Day20: AdventDay {
         return total
     }
 
-    func part1() -> Any {
-        let (start, end, grid) = entities
+    private func commonPart(start: Cell, end: Cell, grid: [[Cell20Type]], up: Int, atLeast: Int) -> Int {
         let path = solve(start: start, end: end, grid: grid)
         var res = 0
         for from in 0..<(path.count - 2) {
-            for to in (from + 1)..<path.count where dist(path[from], path[to]) == 2 {
+            for to in (from + 1)..<path.count where dist(path[from], path[to]) <= up {
                 let distance = to - from
                 let newDistance = dist(path[from], path[to])
-                if distance - newDistance > 99 {
+                if distance - newDistance > atLeast {
                     res += 1
                 }
             }
         }
         return res
     }
+
+    func part1() -> Any {
+        let (start, end, grid) = entities
+        if !isTest {
+            return commonPart(start: start, end: end, grid: grid, up: 2, atLeast: 99)
+        }
+        return commonPart(start: start, end: end, grid: grid, up: 2, atLeast: 9)
+    }
     
     func part2() -> Any {
         let (start, end, grid) = entities
-        let path = solve(start: start, end: end, grid: grid)
-        var res = 0
-        for from in 0..<(path.count - 2) {
-            for to in (from + 1)..<path.count where dist(path[from], path[to]) <= 20 {
-                let distance = to - from
-                let newDistance = dist(path[from], path[to])
-                if distance - newDistance > 99 {
-                    res += 1
-                }
-            }
+        if !isTest {
+            return commonPart(start: start, end: end, grid: grid, up: 20, atLeast: 99)
         }
-        return res
+        return commonPart(start: start, end: end, grid: grid, up: 20, atLeast: 69)
     }
 }
