@@ -4,9 +4,19 @@ import Collections
 
 enum Direction: Character, CaseIterable {
     case up = "^"
-    case down = "v"
+    case down = "V"
     case left = "<"
     case right = ">"
+    
+    init?(rawValue: Character) {
+        switch rawValue {
+        case "^": self = .up
+        case "v", "V": self = .down
+        case "<": self = .left
+        case ">": self = .right
+        default: return nil
+        }
+    }
 
     var index: Int {
         switch self {
