@@ -5,6 +5,7 @@ import Collections
 private final class Node24 {
     var value: Int?
     var inputs = [Node24]()
+    var name = ""
     var operation = ""
     
     func calc() -> Int {
@@ -45,6 +46,7 @@ struct Day24: AdventDay {
         for value in values {
             let node = Node24()
             node.value = Int(value[1])
+            node.name = value[0]
             res[value[0]] = node
         }
         
@@ -57,6 +59,10 @@ struct Day24: AdventDay {
             
             n3.inputs = [n1, n2]
             n3.operation = operation
+            
+            n1.name = first
+            n2.name = second
+            n3.name = right
             
             res[first] = n1
             res[second] = n2
@@ -72,14 +78,50 @@ struct Day24: AdventDay {
     
     func part2() -> Any {
         let start = entities()
-        let expected = calc(input: start, letter: "x") + calc(input: start, letter: "y")
-        print(expected)
         
-        // z_n = (x_n-1 & y_n-1) ^ (x_n ^ y_n)
+        // z_n = ((x_n-1 & y_n-1) | ((x_n-1 ^ y_n-1) & ((x_n-2 ^ y_n-2) | ...))) ^ (x_n ^ y_n)
+        /*
+         z_n = a_n XOR b_n
+         a_n = x_n XOR y_n
+         b_n = (x_n-1 AND y_n-1) OR (a_n-1 AND b_n-1)
+         */
+        let n = start.keys.filter({ $0.first == "z" }).count
+        let lastZ = String(format: "z%02d", n - 1)
         
-        let swaps = [["z06", "ksv"], ["kbs", "nbd"], ["z20", "tqq"], ["z39", "ckb"]]
-
-        return swaps.flatMap({$0}).sorted().joined(separator: ",")
+        var all = [String]()
+        for (res, node) in start {
+            if res.first == "z" {
+                if node.operation != (res != lastZ ? "XOR" : "OR"){
+                    all.append(res)
+                }
+            } else {
+                if node.operation == "XOR" {
+                    if node.inputs.contains(where: { $0.name.first != "x" && $0.name.first != "y" }) {
+                        all.append(res)
+                    } else {
+                        for (_, node2) in start {
+                            if node2.inputs.map({ $0.name }).contains(res) && node2.operation == "OR" {
+                                // XOR result is allowed only in XOR and AND
+                                all.append(res)
+                                break
+                            }
+                        }
+                    }
+                } else if node.operation == "AND", node.inputs.map({ $0.name }).sorted() != ["x00", "y00"] {
+                    for (_, node2) in start {
+                        let hasRes = node2.inputs.map({ $0.name }).contains(res)
+                        if (hasRes && node2.operation != "OR") {
+                            // AND result is allowed only in OR and z1 = (x1 ^ y1) ^ (x0 & y0)
+                            all.append(res)
+                            break
+                        }
+                    }
+                }
+            }
+        }
+        
+//        let swaps = [["z06", "ksv"], ["kbs", "nbd"], ["z20", "tqq"], ["z39", "ckb"]]
+        return all.sorted().joined(separator: ",")
     }
     
     private func calc(input: [String: Node24], letter: Character) -> Int {
